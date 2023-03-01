@@ -1,7 +1,7 @@
 import { db } from "../config/database.js";
 import bcrypt from "bcrypt";
 
-export async function register(req, res){
+export async function register(req, res) {
     const { email, name, password, confirmPassword } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
 
@@ -12,7 +12,8 @@ export async function register(req, res){
             [email]
         );
 
-        if (emailExists.rows.length > 0) return res.status(409).send("Email already registered");
+        if (emailExists.rows.length > 0)
+            return res.status(409).send("Email already registered");
 
         const newUser = await db.query(
             `
