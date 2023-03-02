@@ -20,8 +20,7 @@ export async function register(req, res) {
         const newUser = await db.query(
             `
             INSERT INTO "public.users" (name, email, password)
-            VALUES ($1, $2, $3)
-            RETURNING *`,
+            VALUES ($1, $2, $3)`,
             [name, email, hashedPassword]
         );
         return res.status(201).send("New user registered");
@@ -63,8 +62,7 @@ export async function logIn(req, res) {
             const newSession = await db.query(
                 `
                 INSERT INTO "public.sessions" (token, userid)
-                VALUES ($1, $2)
-                RETURNING *`,
+                VALUES ($1, $2)`,
                 [token, userId]
             );
 
