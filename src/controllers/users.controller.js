@@ -49,7 +49,7 @@ export async function logIn(req, res) {
                 VALUES ($1, $2)`,
                 [token, userId]
             );
-            return res.status(200).send(token)
+            return res.status(200).json({ token: token })
         } else {
             return res.status(401).send("Invalid information");
         }
