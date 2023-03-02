@@ -19,7 +19,7 @@ export async function shortUrl(req, res) {
         );
         return res.status(201).json({
             id: links.rows[0].id,
-            shortUrl: links.rows[0].shortUrl,
+            shortUrl: links.rows[0].shortenedUrl,
         });
     } catch (err) {
         return res.status(500).send(err.message);
