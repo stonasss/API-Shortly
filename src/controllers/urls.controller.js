@@ -41,7 +41,7 @@ export async function getUrl(req, res) {
 
         return res.status(200).json({
             id: urlExists.rows[0].id,
-            shortUrl: urlExists.rows[0].shortUrl,
+            shortUrl: urlExists.rows[0].shortenedUrl,
             url: urlExists.rows[0].url,
         });
     } catch (err) {
@@ -72,6 +72,7 @@ export async function openUrl(req, res) {
         );
 
         const selectedUrl = urlExists.rows[0].url;
+        console.log(selectedUrl)
         return res.redirect(selectedUrl);
     } catch (err) {
         return res.status(500).send(err.message);
@@ -80,7 +81,7 @@ export async function openUrl(req, res) {
 
 export async function deleteUrl(req, res) {
     const { id } = req.params;
-    const userAccess = req.locals.session;
+    const userAccess = res.locals.session;
 
     const userid = userAccess.rows[0].userid;
 
@@ -110,8 +111,8 @@ export async function deleteUrl(req, res) {
 }
 
 export async function userInfo(req, res) {
-    const userAccess = req.locals.session;
-    const userid = userAccess.rows[0].userid;
+    const userAccess = res.locals.session;
+    const userid = userAccess.rows[0].userId;
 
     try {
         const userUrls = await db.query(
@@ -142,7 +143,7 @@ export async function userInfo(req, res) {
         const completeObj = {
             id: userTrack.rows[0].id,
             name: userTrack.rows[0].name,
-            visitCount: userTrack.rows[0].visitCount,
+            visitCount: userTrack.rows[0].visitCount ? userTrack.rows[0].visitCount : 0,
             shortenedUrls: userUrls.rows,
         };
 
