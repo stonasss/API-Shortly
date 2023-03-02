@@ -6,7 +6,7 @@ export async function ranking(req, res) {
             `
             SELECT users.id, users.name, COUNT(urls.id) AS "linksCount", SUM(urls."visitCount") AS "visitCount"
             FROM users
-            LEFT JOIN urls ON users.id = urls.userid
+            LEFT JOIN urls ON users.id = urls."userId"
             GROUP BY users.id
             ORDER BY "visitCount" DESC
             LIMIT 10;`

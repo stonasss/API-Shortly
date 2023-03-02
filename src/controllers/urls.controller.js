@@ -12,7 +12,7 @@ export async function shortUrl(req, res) {
     try {
         const links = await db.query(
             `
-            INSERT INTO urls (userId, url, shortUrl)
+            INSERT INTO urls ("userId", url, "shortenedUrl")
             VALUES ($1, $2, $3)`,
             [userid, url, shorterUrl]
         );
@@ -55,7 +55,7 @@ export async function openUrl(req, res) {
         const urlExists = await db.query(
             `
             SELECT * FROM urls
-            WHERE "shortUrl" = $1`,
+            WHERE "shortenedUrl" = $1`,
             [shortUrl]
         );
         if (urlExists.rows.length === 0)
@@ -66,7 +66,7 @@ export async function openUrl(req, res) {
             `
             UPDATE urls
             SET "visitCount" = $1
-            WHERE "shortUrl" = $2`,
+            WHERE "shortenedUrl" = $2`,
             [addCount, shortUrl]
         );
 
@@ -117,7 +117,7 @@ export async function userInfo(req, res) {
             `
             SELECT
             id,
-            "shortUrl",
+            "shortenedUrl",
             url,
             "visitCount"
             FROM urls

@@ -61,8 +61,9 @@ export async function logIn(req, res) {
         } else {
             const newSession = await db.query(
                 `
-                INSERT INTO sessions (token, userId)
-                VALUES ($1, $2)`,
+                INSERT INTO sessions (token, "userId")
+                VALUES ($1, $2)
+                RETURNING *`,
                 [token, userId]
             );
 
