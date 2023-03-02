@@ -9,8 +9,8 @@ export async function register(req, res) {
     try {
         const emailExists = await db.query(
             `
-            SELECT * FROM "public.users"
-            WHERE "email" = $1`,
+            SELECT * FROM users
+            WHERE email = $1`,
             [email]
         );
 
@@ -19,7 +19,7 @@ export async function register(req, res) {
 
         const newUser = await db.query(
             `
-            INSERT INTO "public.users" (name, email, password)
+            INSERT INTO users (name, email, password)
             VALUES ($1, $2, $3)`,
             [name, email, hashedPassword]
         );
@@ -36,8 +36,8 @@ export async function logIn(req, res) {
     try {
         const userExists = await db.query(
             `
-            SELECT * FROM "public.users"
-            WHERE "email" = $1`,
+            SELECT * FROM users
+            WHERE email = $1`,
             [email]
         );
         const pwCorrect = bcrypt.compareSync(password, userExists.rows[0].password);
@@ -49,8 +49,8 @@ export async function logIn(req, res) {
         const userId = userExists.rows[0].id;
         const sessionExists = await db.query(
             `
-            SELECT * FROM "public.sessions"
-            WHERE "userid" = $1`,
+            SELECT * FROM sessions
+            WHERE "userId" = $1`,
             [userId]
         );
         
@@ -61,7 +61,7 @@ export async function logIn(req, res) {
         } else {
             const newSession = await db.query(
                 `
-                INSERT INTO "public.sessions" (token, userid)
+                INSERT INTO sessions (token, userId)
                 VALUES ($1, $2)`,
                 [token, userId]
             );

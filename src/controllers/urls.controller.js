@@ -12,7 +12,7 @@ export async function shortUrl(req, res) {
     try {
         const links = await db.query(
             `
-            INSERT INTO "public.urls" (userid, url, shortUrl)
+            INSERT INTO urls (userId, url, shortUrl)
             VALUES ($1, $2, $3)`,
             [userid, url, shorterUrl]
         );
@@ -31,7 +31,8 @@ export async function getUrl(req, res) {
     try {
         const urlExists = await db.query(
             `
-            SELECT * FROM "public.urls" WHERE "id" = $1`,
+            SELECT * FROM urls
+            WHERE id = $1`,
             [id]
         );
         if (urlExists.rows.length === 0)
@@ -53,8 +54,8 @@ export async function openUrl(req, res) {
     try {
         const urlExists = await db.query(
             `
-            SELECT * FROM "public.urls"
-            WHERE "shortURL" = $1`,
+            SELECT * FROM urls
+            WHERE "shortUrl" = $1`,
             [shortUrl]
         );
         if (urlExists.rows.length === 0)
@@ -63,7 +64,7 @@ export async function openUrl(req, res) {
         const addCount = urlExists.rows[0].visitCount + 1;
         await db.query(
             `
-            UPDATE "public.urls"
+            UPDATE urls
             SET "visitCount" = $1
             WHERE "shortUrl" = $2`,
             [addCount, shortUrl]
@@ -85,8 +86,8 @@ export async function deleteUrl(req, res) {
     try {
         const idExists = await db.query(
             `
-            SELECT * FROM "public.urls"
-            WHERE "id" = $1`,
+            SELECT * FROM urls
+            WHERE id = $1`,
             [id]
         );
 
@@ -97,7 +98,7 @@ export async function deleteUrl(req, res) {
 
         await db.query(
             `
-            DELETE FROM "public.urls"
+            DELETE FROM urls
             WHERE id = $1`,
             [id]
         );
@@ -119,8 +120,8 @@ export async function userInfo(req, res) {
             "shortUrl",
             url,
             "visitCount"
-            FROM "public.urls"
-            WHERE userid = $1`,
+            FROM urls
+            WHERE "userId" = $1`,
             [userid]
         );
 
@@ -130,9 +131,9 @@ export async function userInfo(req, res) {
             id,
             name,
             (SELECT SUM("visitCount")
-            FROM "public.urls"
-            WHERE userid = $1)
-            FROM "public.users"
+            FROM urls
+            WHERE "userId" = $1)
+            FROM users
             WHERE id = $1`,
             [userid]
         );
