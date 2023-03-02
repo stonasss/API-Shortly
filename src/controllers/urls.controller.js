@@ -5,7 +5,7 @@ export async function shortUrl(req, res) {
     const { url } = req.body;
     const userAccess = res.locals.session;
 
-    const id = userAccess.rows[0].userid;
+    const userid = userAccess.rows[0].userid;
     const nanoid = customAlphabet("1234567890abcdef", 8);
     const shorterUrl = nanoid();
 
@@ -14,7 +14,7 @@ export async function shortUrl(req, res) {
             `
             INSERT INTO "public.urls" (userid, url, shortUrl)
             VALUES ($1, $2, $3)`,
-            [id, url, shorterUrl]
+            [userid, url, shorterUrl]
         );
         return res.status(201).json({
             id: links.rows[0].id,
@@ -71,6 +71,37 @@ export async function openUrl(req, res) {
 
         const selectedUrl = urlExists.rows[0].url;
         return res.redirect(selectedUrl);
+    } catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
+
+export async function deleteUrl(req, res) {
+    const { id } = req.params;
+    const userAccess = req.locals.session;
+    
+    const userid = userAccess.rows[0].userid;
+
+    try {
+        const idExists = await db.query(
+            `
+            SELECT * FROM "public.urls"
+            WHERE "id" = $1`,
+            [id]
+        );
+        if (idExists.rows[0].userid !== userid)
+            return res.status(401).send("Ids do not match")
+        if (idExists.rows.length === 0)
+            return res.status(404).send("Invalid id");
+        
+        await db.query(
+            `
+            DELETE FROM "public.urls"
+            WHERE id = $1`,
+            [id]
+        )
+        return res.status(204).send("url successfully deleted")
+
     } catch (err) {
         return res.status(500).send(err.message);
     }
