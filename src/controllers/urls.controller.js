@@ -5,7 +5,7 @@ export async function shortUrl(req, res) {
     const { url } = req.body;
     const userAccess = res.locals.session;
 
-    const userid = userAccess.rows[0].userid;
+    const userid = userAccess.rows[0].userId;
     const nanoid = customAlphabet("1234567890abcdef", 8);
     const shorterUrl = nanoid();
 
@@ -13,7 +13,8 @@ export async function shortUrl(req, res) {
         const links = await db.query(
             `
             INSERT INTO urls ("userId", url, "shortenedUrl")
-            VALUES ($1, $2, $3)`,
+            VALUES ($1, $2, $3)
+            RETURNING * `,
             [userid, url, shorterUrl]
         );
         return res.status(201).json({
