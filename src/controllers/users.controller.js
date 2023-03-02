@@ -8,7 +8,7 @@ export async function register(req, res) {
     try {
         const emailExists = await db.query(
             `
-            SELECT * FROM public.users WHERE "email = $1`,
+            SELECT * FROM "public.users" WHERE "email" = $1`,
             [email]
         );
 
@@ -17,7 +17,7 @@ export async function register(req, res) {
 
         const newUser = await db.query(
             `
-            INSERT INTO public.users (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
+            INSERT INTO "public.users" (name, email, password) VALUES ($1, $2, $3) RETURNING *`,
             [name, email, hashedPassword]
         );
         return res.status(201).send("New user registered");
