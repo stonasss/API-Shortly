@@ -79,7 +79,7 @@ export async function openUrl(req, res) {
 export async function deleteUrl(req, res) {
     const { id } = req.params;
     const userAccess = req.locals.session;
-    
+
     const userid = userAccess.rows[0].userid;
 
     try {
@@ -89,19 +89,62 @@ export async function deleteUrl(req, res) {
             WHERE "id" = $1`,
             [id]
         );
+
         if (idExists.rows[0].userid !== userid)
-            return res.status(401).send("Ids do not match")
+            return res.status(401).send("Ids do not match");
         if (idExists.rows.length === 0)
             return res.status(404).send("Invalid id");
-        
+
         await db.query(
             `
             DELETE FROM "public.urls"
             WHERE id = $1`,
             [id]
-        )
-        return res.status(204).send("url successfully deleted")
+        );
+        return res.status(204).send("url successfully deleted");
+    } catch (err) {
+        return res.status(500).send(err.message);
+    }
+}
 
+export async function userInfo(req, res) {
+    const userAccess = req.locals.session;
+    const userid = userAccess.rows[0].userid;
+
+    try {
+        const userUrls = await db.query(
+            `
+            SELECT
+            id,
+            "shortUrl",
+            url,
+            "visitCount"
+            FROM "public.urls"
+            WHERE userid = $1`,
+            [userid]
+        );
+
+        const userTrack = await db.query(
+            `
+            SELECT
+            id,
+            name,
+            (SELECT SUM("visitCount")
+            FROM "public.urls"
+            WHERE userid = $1)
+            FROM "public.users"
+            WHERE id = $1`,
+            [userid]
+        );
+
+        const completeObj = {
+            id: userTrack.rows[0].id,
+            name: userTrack.rows[0].name,
+            visitCount: userTrack.rows[0].visitCount,
+            shortenedUrls: userUrls.rows,
+        };
+
+        return res.status(200).send(completeObj);
     } catch (err) {
         return res.status(500).send(err.message);
     }
