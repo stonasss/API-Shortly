@@ -63,6 +63,7 @@ export async function openUrl(req, res) {
             return res.status(404).send("Invalid url");
 
         const addCount = urlExists.rows[0].visitCount + 1;
+        console.log(addCount)
         await db.query(
             `
             UPDATE urls
@@ -83,7 +84,7 @@ export async function deleteUrl(req, res) {
     const { id } = req.params;
     const userAccess = res.locals.session;
 
-    const userid = userAccess.rows[0].userid;
+    const userid = userAccess.rows[0].userId;
 
     try {
         const idExists = await db.query(
@@ -93,10 +94,10 @@ export async function deleteUrl(req, res) {
             [id]
         );
 
-        if (idExists.rows[0].userid !== userid)
-            return res.status(401).send("Ids do not match");
         if (idExists.rows.length === 0)
             return res.status(404).send("Invalid id");
+        if (idExists.rows[0].userId !== userid)
+            return res.status(401).send("Ids do not match");
 
         await db.query(
             `
@@ -134,7 +135,7 @@ export async function userInfo(req, res) {
             name,
             (SELECT SUM("visitCount")
             FROM urls
-            WHERE "userId" = $1)
+            WHERE "userId" = $1) AS "visitCount"
             FROM users
             WHERE id = $1`,
             [userid]
@@ -143,7 +144,7 @@ export async function userInfo(req, res) {
         const completeObj = {
             id: userTrack.rows[0].id,
             name: userTrack.rows[0].name,
-            visitCount: userTrack.rows[0].visitCount ? userTrack.rows[0].visitCount : 0,
+            visitCount: userTrack.rows[0].visitCount ? Number(userTrack.rows[0].visitCount) : 0,
             shortenedUrls: userUrls.rows,
         };
 
