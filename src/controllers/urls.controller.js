@@ -119,7 +119,7 @@ export async function userInfo(req, res) {
             `
             SELECT
             id,
-            "shortenedUrl",
+            "shortenedUrl" AS "shortUrl",
             url,
             "visitCount"
             FROM urls
